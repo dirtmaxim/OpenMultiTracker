@@ -76,7 +76,7 @@ struct TextureCodeword{
 	int m_iT_first_time;									//the first access time
 	int m_iT_last_time;										//the last access time
 
-	//Æò±Õ MTLBP°ª
+	//ï¿½ï¿½ï¿½ MTLBPï¿½ï¿½
 	float m_fLowThre;										//a low threshold for the matching 
 	float m_fHighThre;										//a high threshold for the matching
 	float m_fMean;											//mean of the codeword
@@ -98,7 +98,7 @@ struct ColorCodeword{
 	int m_iT_first_time;									//the first access time
 	int m_iT_last_time;										//the last access time
 
-	double m_dMean[3];										//mean vector of the codeword
+	double m_dMean[3];										//mean points of the codeword
 
 };
 

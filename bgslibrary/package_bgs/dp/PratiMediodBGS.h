@@ -94,7 +94,7 @@ namespace Algorithms
       // sum of L-inf distances from a sample point to all other sample points
       struct MEDIAN_BUFFER
       {
-        std::vector<RgbPixel> pixels;		// vector of pixels at give location in image
+        std::vector<RgbPixel> pixels;		// points of pixels at give location in image
         std::vector<int> dist;					// distance from pixel to all other pixels
         int pos;												// current position in circular buffer
 
