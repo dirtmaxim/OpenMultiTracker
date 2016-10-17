@@ -27,7 +27,7 @@ void VideoHandler::handle() {
 
         // First frame might be empty.
         if (img_input.data != NULL) {
-            cv::imshow("HockeyPlayerRecognizer", img_input);
+            cv::imshow("HockeyPlayerDetector", img_input);
         }
 
         if (cv::waitKey(fps) >= 0) {
