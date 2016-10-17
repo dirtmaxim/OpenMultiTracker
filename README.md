@@ -3,7 +3,7 @@
 ##### It uses computer vision methods to detect players on the hockey field.
 
 ```
-Required:
+Requirements:
 - C++11 compiler;
 - OpenCV3 built with ffmpeg support;
 - Bgslibrary for OpenCV3 (libbgs.dylib is built library for Mac OS X,
