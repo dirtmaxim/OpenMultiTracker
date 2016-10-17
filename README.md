@@ -6,6 +6,6 @@
 Requirements:
 - C++11 compiler;
 - OpenCV3 built with ffmpeg support;
-- Bgslibrary for OpenCV3 (libbgs.dylib is built library for Mac OS X,
+- Bgslibrary for OpenCV 3 (libbgs.dylib is built library for Mac OS X,
 bgslibrary - folder that contains headers for built library).
 ```

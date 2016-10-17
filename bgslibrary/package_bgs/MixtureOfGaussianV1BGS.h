@@ -40,7 +40,7 @@ public:
   MixtureOfGaussianV1BGS();
   ~MixtureOfGaussianV1BGS();
 
-  void process(const cv::Mat &img_input, cv::Mat &img_output, cv::Mat &img_bgmodel);
+  void process(const cv::Mat &frame, cv::Mat &img_output, cv::Mat &img_bgmodel);
 
 private:
   void saveConfig();
