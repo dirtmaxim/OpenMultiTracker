@@ -1,4 +1,5 @@
 #include "RinkBackgroundSubtractor.h"
+#include <vector>
 
 /**
  * This class composes all kind of work on video stream.
@@ -13,7 +14,7 @@ private:
     /**
      * Class that delegates to IndependentMultimodalBGS method from bgslibrary.
      */
-    RinkBackgroundSubtractor backgroundSubtractor;
+    RinkBackgroundSubtractor rinkBackgroundSubtractor;
 
     /**
      * Region of interess. It will be loaded from file at first start
@@ -39,8 +40,9 @@ private:
     /**
      * Original width will be truncated due to performance reasons.
      * Height will be truncated in proportional manner.
+     * If you have intention to change this parameter, delete region.png at first.
      */
-    const int truncatedWidth = 500;
+    const int truncatedWidth = 600;
 
     /**
      *

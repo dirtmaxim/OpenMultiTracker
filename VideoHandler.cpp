@@ -35,6 +35,7 @@ VideoHandler::VideoHandler(char const* file_name) {
             } while (code == 82 || code == 114);
 
             cv::imwrite("region.png", this->region);
+            this->rinkBackgroundSubtractor.reload();
         }
     }
 }
@@ -61,7 +62,7 @@ void VideoHandler::handle() {
         img_input.copyTo(processed_img_input, this->region);
 
         // Background subtraction.
-        processed_img_input = backgroundSubtractor.process(processed_img_input);
+        processed_img_input = rinkBackgroundSubtractor.process(processed_img_input);
 
         // Threshold.
         cv::threshold(processed_img_input, processed_img_input, 128, 255, cv::THRESH_OTSU);
@@ -80,6 +81,7 @@ void VideoHandler::handle() {
             } while (code == 82 || code == 114);
 
             cv::imwrite("region.png", this->region);
+            this->rinkBackgroundSubtractor.reload();
         } else if (code >= 0) {
             break;
         }

@@ -35,7 +35,7 @@ void RegionChooser::choose() {
 
 void RegionChooser::onMouse(int event, int x, int y, int, void*) {
     if (event == cv::EVENT_LBUTTONDOWN) {
-        points.insert(points.end(), cv::Point(x, y));
+        points.push_back(cv::Point(x, y));
 
         // Skip first point.
         if (points.size() > 1) {
@@ -53,6 +53,18 @@ void RegionChooser::onMouse(int event, int x, int y, int, void*) {
 
 cv::Mat RegionChooser::getRegion() {
     cv::Mat region(this->pointedFrame.size(), CV_8UC1, cv::Scalar(0, 0, 0));
-    cv::fillConvexPoly(region, this->points, cv::Scalar(255, 255, 255));
+    cv::Point* points = new cv::Point[this->points.size()];
+
+    for (int i = 0; i < this->points.size(); i++) {
+        points[i] = this->points[i];
+    }
+
+    const cv::Point* polygons[1];
+    polygons[0] = points;
+    int polygonsCount[1];
+    polygonsCount[0] = (int) this->points.size();
+
+    // It can fill any polygons whether convex or concave.
+    cv::fillPoly(region, polygons, polygonsCount, 1, cv::Scalar(255, 255, 255));
     return region;
 }
