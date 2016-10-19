@@ -12,5 +12,8 @@ int main() {
 
 void help() {
     std::cout << "Commands:" << endl;
-    std::cout << "r - change region of interest" << endl;
+    std::cout << "\tr - change region of interest" << endl;
+    std::cout << "\tb - show background subtraction process" << endl;
+    std::cout << "\tc - show contoured image" << endl;
+    std::cout << "\to - show original video" << endl;
 }

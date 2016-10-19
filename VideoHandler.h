@@ -23,6 +23,12 @@ private:
     cv::Mat region;
 
     /**
+     * Mode of output video.
+     * 0 - original, 1 - background subtraction, 2 - contoured image.
+     */
+    int mode;
+
+    /**
      * Original width of frame.
      */
     int width;
@@ -49,9 +55,9 @@ private:
      * Method delegates to RegionChooser class and add warning lables onto image.
      *
      * @param img_input Current frame of image
-     * @return Code of pressed key
+     * @return Region of interest
      */
-    int chooseRegion(cv::Mat);
+    cv::Mat chooseRegion(cv::Mat);
 public:
     /**
      * It performs initialization and truncates frame according to {@link #truncatedWidth}.
