@@ -29,6 +29,11 @@ private:
     int mode;
 
     /**
+     * Show system information of process in the left top corner.
+     */
+    bool showSystemInformation;
+
+    /**
      * Original width of frame.
      */
     int width;
@@ -48,7 +53,7 @@ private:
      * Height will be truncated in proportional manner.
      * If you have intention to change this parameter, delete region.png at first.
      */
-    const int truncatedWidth = 600;
+    const int truncatedWidth = 800;
 
     /**
      *
