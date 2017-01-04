@@ -19,7 +19,8 @@ Tracker::Tracker(
         distanceThreshold(dist_thres_),
         maximum_allowed_skipped_frames(maximum_allowed_skipped_frames_),
         max_trace_length(max_trace_length_),
-        NextTrackID(0)
+        NextTrackID(0),
+        occlusionHandler(OcclusionHandler())
 {
 }
 
@@ -34,7 +35,8 @@ Tracker::Tracker() {}
 void Tracker::update(
         const std::vector<Point_t> &detections,
         const std::vector<cv::Rect> &rects,
-        DistType distType)
+        DistType distType,
+        cv::Mat* imgOutput)
 {
 
     assert(detections.size() == rects.size());
@@ -49,14 +51,37 @@ void Tracker::update(
         // Matrix of distance between N-th track and M-th detection.
         distMatrix_t Cost(N * M);
 
+        // Check for collisions
+        // Find merges on the video
+        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(rects);
+
+
+        // Find splits on the video
+        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(rects);
+
+        for (int i = 0; i < merges.size(); ++i) {
+            cv::rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
+        }
+
+        for (int i = 0; i < splits.size(); ++i) {
+            cv::rectangle(*imgOutput, splits[i], cv::Scalar(0, 255, 255), 3);
+        }
+
+        // Show previous frames in green rectangles
+        for (int i = 0; i < occlusionHandler.buffer.size(); ++i) {
+            cv::rectangle(*imgOutput, occlusionHandler.buffer[i], cv::Scalar(0, 255, 0), 1);
+        }
+
         // -----------------------------------
         // Step 1: Plot to Track Association. Fill the distance matrix with values
         // -----------------------------------
+
         switch (distType)
         {
             case CentersDist:
                 for (size_t i = 0; i < tracks.size(); i++)
                 {
+                    //Distance between prediction of the tracker and actual detection
                     for (size_t j = 0; j < detections.size(); j++)
                     {
                         Cost[i + j * N] = tracks[i]->calculateDistance(detections[j]);
@@ -76,11 +101,13 @@ void Tracker::update(
                 }
                 break;
         }
+        // Find merges on the video
+
 
 
         // Solving assignment problem (tracks and predictions of Kalman filter)
         DataAssociationAlgorithm HungarianAlg;
-        HungarianAlg.solve(Cost, N, M, assignment, DataAssociationAlgorithm::optimal);
+        HungarianAlg.solve(Cost, N, M, assignment, DataAssociationAlgorithm::many_forbidden_assignments);
 
         // -----------------------------------
         // Remove assignment from pairs with large distance
@@ -114,6 +141,8 @@ void Tracker::update(
                 i--;
             }
         }
+        // ===================== Occlusion handling ============================
+
     }
 
     // -----------------------------------
@@ -144,6 +173,7 @@ void Tracker::update(
         }
     }
 
+    occlusionHandler.fillBuffer(rects);
 }
 // ---------------------------------------------------------------------------
 //
@@ -151,5 +181,6 @@ void Tracker::update(
 Tracker::~Tracker(void)
 {
 }
+
 
 

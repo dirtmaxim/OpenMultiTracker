@@ -15,7 +15,7 @@ cv::Mat VideoHandler::chooseRegion(cv::Mat img_input) {
 
 VideoHandler::VideoHandler(char const* file_name, int argc, char *argv[]) {
     this->videoCapture = cv::VideoCapture(file_name);
-    this->occlusionHandler = OcclusionHandler();
+//    this->occlusionHandler = OcclusionHandler();
     this->width = (int) videoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
     this->height = (int) videoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
     this->fps = (int) videoCapture.get(CV_CAP_PROP_FPS);
@@ -156,7 +156,7 @@ void VideoHandler::handle() {
         }
 
         //===============================Testing====================================
-        tracker.update(m_centers,m_rects,Tracker::CentersDist);
+        tracker.update(m_centers,m_rects,Tracker::CentersDist, img_output);
         for (auto p : m_centers)
         {
             cv::circle(*img_output, p, 3, cv::Scalar(0, 255, 0), 1, CV_AA);
@@ -175,42 +175,22 @@ void VideoHandler::handle() {
             }
         }
         //===============================Testing====================================
-
-        // Find merges on the video
-        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(currentBlobs);
-        for (int i = 0; i < merges.size(); ++i) {
-            cv::rectangle(*img_output, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
-        }
-
-        // Find splits on the video
-        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(currentBlobs);
-        for (int i = 0; i < splits.size(); ++i) {
-            cv::rectangle(*img_output, splits[i], cv::Scalar(0, 255, 255), 3);
-        }
-
         if (this->showSystemInformation) {
             // Show system information.
             cv::putText(*img_output, std::string("Frame: ") + std::to_string((int) this->videoCapture.get(CV_CAP_PROP_POS_FRAMES)),
                         cv::Point(20, 20), cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(255, 255, 255), 1);
         }
 
-        // Show previous frames in green rectangles
-        for (int i = 0; i < occlusionHandler.buffer.size(); ++i) {
-            cv::rectangle(*img_output, occlusionHandler.buffer[i], cv::Scalar(0, 255, 0), 1);
-        }
-
         cv::imshow("HockeyPlayerDetector", *img_output);
 
         // Pause video to show occlusions
-        if (merges.size()>0 || splits.size()>0){
-            if (writeOutput) {
-                std::string image = "output/occlusions/img" + std::to_string(written_image_counter++) + ".png";
-                cv::imwrite(image, *img_output);
-            }
+//        if (merges.size()>0 || splits.size()>0){
+//            if (writeOutput) {
+//                std::string image = "output/occlusions/img" + std::to_string(written_image_counter++) + ".png";
+//                cv::imwrite(image, *img_output);
+//            }
 //            cv::waitKey(0);
-        }
-
-        occlusionHandler.fillBuffer(currentBlobs);
+//        }
         // Video speed according to fps.
         int code = cv::waitKey(fps);
 

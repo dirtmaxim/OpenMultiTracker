@@ -8,23 +8,20 @@
 
 #include <opencv2/core/types.hpp>
 #include <forward_list>
-#include "../Developing/Tracker.h"
-
-class Occlusion{
-public:
-    std::vector<Track> tracksOfOccludedObjects;
-
-};
+#include "../Developing/Track.h"
+#include "../Developing/DataAssociationAlgorithm.h"
 
 class OcclusionHandler {
 private:
     int threshold = 100;
+    float mergeThreshold = 100;
+    std::vector<bool> isMerges;
 
 public:
     std::vector<cv::Rect> buffer;
 
     /**
-     * The function cheks whether 2 blobs merged to one or whether the merged blob is splitted to blobs. It is based on
+     * The function cheсks whether 2 blobs merged to one or whether the merged blob is splitted to blobs. It is based on
      * area of intersection between blobs on 2 consecutive frames
      *
      * @param blob1 - in previous frame for merge detection / in current frame for split detection
@@ -54,6 +51,7 @@ public:
      */
     void fillBuffer(std::vector<cv::Rect> buffer);
 
+    void update(std::vector<Track> tracks);
 };
 
 

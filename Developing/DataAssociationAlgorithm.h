@@ -19,8 +19,9 @@ private:
     // --------------------------------------------------------------------------
     void assignmentOptimal(assignments_t &assignment, track_t &cost, const distMatrix_t &distMatrixIn, size_t nOfRows,
                            size_t nOfColumns);
-    void buildassignmentvector(assignments_t& assignment, bool *starMatrix, size_t nOfRows, size_t nOfColumns);
-    void computeassignmentcost(const assignments_t& assignment, track_t& cost, const distMatrix_t& distMatrixIn, size_t nOfRows);
+    void buildAssignmentVector(assignments_t &assignment, bool *starMatrix, size_t nOfRows, size_t nOfColumns);
+    void computeAssignmentCost(const assignments_t &assignment, track_t &cost, const distMatrix_t &distMatrixIn,
+                               size_t nOfRows);
     void step2a(assignments_t& assignment, track_t *distMatrix, bool *starMatrix, bool *newStarMatrix, bool *primeMatrix, bool *coveredColumns, bool *coveredRows, size_t nOfRows, size_t nOfColumns, size_t minDim);
     void step2b(assignments_t& assignment, track_t *distMatrix, bool *starMatrix, bool *newStarMatrix, bool *primeMatrix, bool *coveredColumns, bool *coveredRows, size_t nOfRows, size_t nOfColumns, size_t minDim);
     void step3(assignments_t& assignment, track_t *distMatrix, bool *starMatrix, bool *newStarMatrix, bool *primeMatrix, bool *coveredColumns, bool *coveredRows, size_t nOfRows, size_t nOfColumns, size_t minDim);

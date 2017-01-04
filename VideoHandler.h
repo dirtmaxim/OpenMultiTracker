@@ -20,10 +20,9 @@ private:
     RinkBackgroundSubtractor rinkBackgroundSubtractor;
 
     /**
-     * Class for handling occlusions
+     * Class for tracking management
      */
-    OcclusionHandler occlusionHandler;
-
+     Tracker tracker;
 
     /**
      * Region of interess. It will be loaded from file at first start

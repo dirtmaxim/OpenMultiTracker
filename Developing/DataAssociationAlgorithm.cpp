@@ -3,7 +3,6 @@
 //
 
 #include "DataAssociationAlgorithm.h"
-#include <limits>
 
 DataAssociationAlgorithm::DataAssociationAlgorithm()
 {
@@ -164,7 +163,7 @@ void DataAssociationAlgorithm::assignmentOptimal(assignments_t &assignment, trac
     /* move to step 2b */
     step2b(assignment, distMatrix, starMatrix, newStarMatrix, primeMatrix, coveredColumns, coveredRows, nOfRows, nOfColumns, (nOfRows <= nOfColumns) ? nOfRows : nOfColumns);
     /* compute cost and remove invalid assignments */
-    computeassignmentcost(assignment, cost, distMatrixIn, nOfRows);
+    computeAssignmentCost(assignment, cost, distMatrixIn, nOfRows);
     /* free allocated memory */
     free(distMatrix);
     free(coveredColumns);
@@ -177,7 +176,8 @@ void DataAssociationAlgorithm::assignmentOptimal(assignments_t &assignment, trac
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
-void DataAssociationAlgorithm::buildassignmentvector(assignments_t& assignment, bool *starMatrix, size_t nOfRows, size_t nOfColumns)
+void DataAssociationAlgorithm::buildAssignmentVector(assignments_t &assignment, bool *starMatrix, size_t nOfRows,
+                                                     size_t nOfColumns)
 {
     for (size_t row = 0; row < nOfRows; row++)
     {
@@ -194,7 +194,8 @@ void DataAssociationAlgorithm::buildassignmentvector(assignments_t& assignment, 
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
-void DataAssociationAlgorithm::computeassignmentcost(const assignments_t& assignment, track_t& cost, const distMatrix_t& distMatrixIn, size_t nOfRows)
+void DataAssociationAlgorithm::computeAssignmentCost(const assignments_t &assignment, track_t &cost,
+                                                     const distMatrix_t &distMatrixIn, size_t nOfRows)
 {
     for (size_t row = 0; row < nOfRows; row++)
     {
@@ -207,7 +208,7 @@ void DataAssociationAlgorithm::computeassignmentcost(const assignments_t& assign
 }
 
 // --------------------------------------------------------------------------
-//
+//  Cover all the columns containing a starred zero
 // --------------------------------------------------------------------------
 void DataAssociationAlgorithm::step2a(assignments_t& assignment, track_t *distMatrix, bool *starMatrix, bool *newStarMatrix, bool *primeMatrix, bool *coveredColumns, bool *coveredRows, size_t nOfRows, size_t nOfColumns, size_t minDim)
 {
@@ -247,7 +248,7 @@ void DataAssociationAlgorithm::step2b(assignments_t& assignment, track_t *distMa
     if (nOfCoveredColumns == minDim)
     {
         /* algorithm finished */
-        buildassignmentvector(assignment, starMatrix, nOfRows, nOfColumns);
+        buildAssignmentVector(assignment, starMatrix, nOfRows, nOfColumns);
     }
     else
     {
@@ -371,7 +372,7 @@ void DataAssociationAlgorithm::step4(assignments_t& assignment, track_t *distMat
 }
 
 // --------------------------------------------------------------------------
-//
+// Alpha conversion - add minimal element from uncovered matrix to covered rows and subtract it from the columns
 // --------------------------------------------------------------------------
 void DataAssociationAlgorithm::step5(assignments_t& assignment, track_t *distMatrix, bool *starMatrix, bool *newStarMatrix, bool *primeMatrix, bool *coveredColumns, bool *coveredRows, size_t nOfRows, size_t nOfColumns, size_t minDim)
 {
@@ -719,3 +720,4 @@ void DataAssociationAlgorithm::assignmentSuboptimal1(assignments_t &assignment, 
     free(nOfValidTracks);
     free(distMatrix);
 }
+
