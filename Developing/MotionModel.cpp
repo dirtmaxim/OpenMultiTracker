@@ -93,9 +93,9 @@ Point_t MotionModel::Update(Point_t p, bool DataCorrect)
         measurement.at<track_t>(1) = p.y;
     }
     // Correction
-    cv::Mat estiMated = kalman->correct(measurement);
-    LastResult.x = estiMated.at<track_t>(0);   //update using measurements
-    LastResult.y = estiMated.at<track_t>(1);
+    cv::Mat estimated = kalman->correct(measurement);
+    LastResult.x = estimated.at<track_t>(0);   //update using measurements
+    LastResult.y = estimated.at<track_t>(1);
     return LastResult;
 }
 //---------------------------------------------------------------------------

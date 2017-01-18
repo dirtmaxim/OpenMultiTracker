@@ -3,12 +3,14 @@
 //
 
 #include "OcclusionHandler.h"
+#include "../Developing/DataAssociationAlgorithm.h"
 
-bool OcclusionHandler::isMerge(cv::Rect blob1, cv::Rect blob2, cv::Rect potentialMerge) {
-    return (blob1 & potentialMerge).area() > threshold && (blob2 & potentialMerge).area() > threshold;
+bool OcclusionHandler::isMerge(const ObjectState &object1, const ObjectState &object2,
+                               const ObjectState &potentialMerge) {
+    return (object1.boundingBox() & potentialMerge.boundingBox()).area() > threshold && (object2.boundingBox() & potentialMerge.boundingBox()).area() > threshold;
 }
 
-std::vector<cv::Rect> OcclusionHandler::findAllMerges(std::vector<cv::Rect> blobs) {
+std::vector<cv::Rect> OcclusionHandler::findAllMerges(const std::vector<ObjectState> &detections) {
     std::vector<cv::Rect> merges;
 
     //Checks the collisions by pairs of the rectangles
@@ -16,16 +18,15 @@ std::vector<cv::Rect> OcclusionHandler::findAllMerges(std::vector<cv::Rect> blob
     for (int l = 0; l < buffer.size(); ++l) {
         isMerges[l] = (false);
     }
-    if (buffer.size() != 0 && blobs.size() != 0){
+    if (buffer.size() != 0 && detections.size() != 0){
         for (int i = 0; i < buffer.size()-1; ++i) {
             for (int j = i+1; j < buffer.size(); ++j) {
-                for (int k = 0; k < blobs.size(); ++k) {
+                for (int k = 0; k < detections.size(); ++k) {
                     if (!(isMerges[i] || isMerges[j])) {
-                        if (isMerge(buffer[i], buffer[j], blobs[k])) {
-                            merges.push_back(blobs[k]);
+                        if (isMerge(buffer[i], buffer[j], detections[k])) {
+                            merges.push_back(detections[k].boundingBox());
                             isMerges[i] = true;
                             isMerges[j] = true;
-                            std::cout << blobs[k] << std::endl;
                         };
                     };
                 }
@@ -36,7 +37,7 @@ std::vector<cv::Rect> OcclusionHandler::findAllMerges(std::vector<cv::Rect> blob
     return merges;
 }
 
-void OcclusionHandler::fillBuffer(std::vector<cv::Rect> buffer) {
+void OcclusionHandler::fillBuffer(std::vector<ObjectState> buffer) {
     this->buffer = buffer;
 }
 
@@ -47,7 +48,7 @@ std::vector<cv::Rect> OcclusionHandler::findAllSplits(std::vector<cv::Rect> blob
             for (int j = i+1; j < blobs.size(); ++j) {
                 for (int k = 0; k < buffer.size(); ++k) {
                     if (isMerge(blobs[i], blobs[j], buffer[k])){
-                        splits.push_back(buffer[k]);
+                        splits.push_back(buffer[k].boundingBox());
                     };
                 }
             }
@@ -100,6 +101,4 @@ void findMerges(std::vector<Track> tracks, std::vector<cv::Rect> detections){
 
         }
     }
-
-
 }

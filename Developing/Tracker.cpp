@@ -46,15 +46,15 @@ void Tracker::update(
 
         // Check for collisions
         // Find merges on the video
-//        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(detections);
+        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(detections);
 
 
         // Find splits on the video
 //        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(detections);
 
-//        for (int i = 0; i < merges.size(); ++i) {
-//            cv::rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
-//        }
+        for (int i = 0; i < merges.size(); ++i) {
+            cv::rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
+        }
 //
 //        for (int i = 0; i < splits.size(); ++i) {
 //            cv::rectangle(*imgOutput, splits[i], cv::Scalar(0, 255, 255), 3);
@@ -62,7 +62,7 @@ void Tracker::update(
 
         // Show previous frames in green rectangles
         for (int i = 0; i < occlusionHandler.buffer.size(); ++i) {
-            cv::rectangle(*imgOutput, occlusionHandler.buffer[i], cv::Scalar(0, 255, 0), 1);
+            cv::rectangle(*imgOutput, occlusionHandler.buffer[i].boundingBox(), cv::Scalar(0, 255, 0), 1);
         }
 
         // -----------------------------------
@@ -112,7 +112,6 @@ void Tracker::update(
             }
         }
         // ===================== Occlusion handling ============================
-
     }
 
     // -----------------------------------
@@ -139,7 +138,7 @@ void Tracker::update(
         }
     }
 
-//    occlusionHandler.fillBuffer(rects);
+    occlusionHandler.fillBuffer(detections);
 }
 
 // ---------------------------------------------------------------------------

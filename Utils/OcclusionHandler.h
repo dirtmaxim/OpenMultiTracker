@@ -7,9 +7,7 @@
 
 
 #include <opencv2/core/types.hpp>
-#include <forward_list>
 #include "../Developing/Track.h"
-#include "../Developing/DataAssociationAlgorithm.h"
 
 class OcclusionHandler {
 private:
@@ -18,25 +16,25 @@ private:
     std::vector<bool> isMerges;
 
 public:
-    std::vector<cv::Rect> buffer;
+    std::vector<ObjectState> buffer;
 
     /**
      * The function cheсks whether 2 blobs merged to one or whether the merged blob is splitted to blobs. It is based on
      * area of intersection between blobs on 2 consecutive frames
      *
-     * @param blob1 - in previous frame for merge detection / in current frame for split detection
-     * @param blob2 - in previous frame for merge detection / in current frame for split detection
+     * @param object1 - in previous frame for merge detection / in current frame for split detection
+     * @param object2 - in previous frame for merge detection / in current frame for split detection
      * @param potentialMerge - in current frame for merge detection / in previous frame for split detection
      * @return true if merge or split occured, if there was no any merge then it returns false
      */
-    bool isMerge(cv::Rect blob1, cv::Rect blob2, cv::Rect potentialMerge);
+    bool isMerge(const ObjectState &object1, const ObjectState &object2, const ObjectState &potentialMerge);
 
     /**
      * Finds all merges on the frame according to the intersection rule
-     * @param blobs - current frame's blobs (measures)
+     * @param detections - current frame's blobs (measures)
      * @return - collection of all merges
      */
-    std::vector<cv::Rect> findAllMerges(std::vector<cv::Rect> blobs);
+    std::vector<cv::Rect> findAllMerges(const std::vector<ObjectState> &detections);
 
     /**
      * Finds all splits on the frame according to the intersection rule
@@ -49,7 +47,7 @@ public:
      * Fills  buffer with blobs
      * @param buffer
      */
-    void fillBuffer(std::vector<cv::Rect> buffer);
+    void fillBuffer(std::vector<ObjectState> buffer);
 
     void update(std::vector<Track> tracks);
 };
