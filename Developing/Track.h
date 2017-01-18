@@ -9,6 +9,7 @@
 #include "Track.h"
 #include "../Utils/defines.h"
 #include "MotionModel.h"
+#include "ObjectState.h"
 
 /**
  *  Representation of a track with all necessary information about object state
@@ -20,23 +21,15 @@ public:
     size_t track_id;
     size_t skipped_frames;
 
-    Track(const Point_t& p, const cv::Rect& rect, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> RelatedTracks = {0});
+    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> RelatedTracks = {0});
 
     /**
      * Method for calculating distance between points in the feature space. Used for distance between centroid of
      * potential plot and predicted track position.
-     * @param p - point of new measure
+     * @param p - new measure
      * @return - distance
      */
-    track_t calculateDistance(const Point_t &p);
-
-    /**
-     * Overloaded method for calculating distance between centers of bounding boxes of potential plot and last
-     * track position.
-     * @param r - bpunding box of new measure
-     * @return - distance
-     */
-    track_t calculateDistance(const cv::Rect &r);
+    track_t calculateDistance(const ObjectState &p);
 
     /**
      * Method that performs all basic steps of track management and model maintenace.
@@ -45,7 +38,7 @@ public:
      * @param dataCorrect
      * @param max_trace_length
      */
-    void update(const Point_t &p, const cv::Rect &rect, bool dataCorrect, size_t max_trace_length);
+    void update(const ObjectState &p, bool dataCorrect, size_t max_trace_length);
 
     cv::Rect getLastRect();
 

@@ -16,12 +16,11 @@ ObjectState::ObjectState(cv::Rect boundingBox) {
     rect = boundingBox;
 }
 
-ObjectState::ObjectState(Point_t center, track_t width, track_t height) {
-    
+ObjectState::ObjectState(const Point_t &center, track_t width, track_t height) {
+    rect = cv::Rect_<track_t >(center.x - width/2, center.y-height/2, width, height);
 }
 
 ObjectState::ObjectState() {
-
 }
 
 ObjectState::~ObjectState() {

@@ -128,7 +128,7 @@ void VideoHandler::handle() {
         img_input.copyTo(blobs_labeled_img, processed_img_input);
 
         //Another insert
-        std::vector<cv::Rect> m_rects;
+        std::vector<ObjectState> m_rects;
         std::vector<Point_t> m_centers;
 
         for(auto contour: contours) {
@@ -137,7 +137,7 @@ void VideoHandler::handle() {
                 // Find bounding rect of contour.
                 cv::Rect rect = cv::boundingRect(contour);
                 //Insert
-                m_rects.push_back(rect);
+                m_rects.push_back(ObjectState(rect));
                 m_centers.push_back((rect.br() + rect.tl())*0.5);
 
                 // Append new rectangle to currentBlobs
@@ -156,7 +156,7 @@ void VideoHandler::handle() {
         }
 
         //===============================Testing====================================
-        tracker.update(m_centers,m_rects,Tracker::CentersDist, img_output);
+        tracker.update(m_rects, img_output);
         for (auto p : m_centers)
         {
             cv::circle(*img_output, p, 3, cv::Scalar(0, 255, 0), 1, CV_AA);

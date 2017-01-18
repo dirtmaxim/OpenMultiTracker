@@ -19,7 +19,7 @@ public:
     cv::Rect boundingBox()const;
 
     ObjectState(cv::Rect boundingBox);
-    ObjectState(Point_t center, track_t width = 0, track_t height = 0);
+    ObjectState(const Point_t &center, track_t width = 0, track_t height = 0);
     ObjectState();
     ~ObjectState();
 };
