@@ -4,7 +4,8 @@
 
 #include "DataAssociationAlgorithm.h"
 
-DataAssociationAlgorithm::DataAssociationAlgorithm()
+DataAssociationAlgorithm::DataAssociationAlgorithm(int unassignedLabel) :
+unassignedLabel(unassignedLabel)
 {
 }
 
@@ -185,7 +186,8 @@ void DataAssociationAlgorithm::buildAssignmentVector(assignments_t &assignment, 
         {
             if (starMatrix[row + nOfRows * col])
             {
-                assignment[row] = static_cast<int>(col);
+                int val = static_cast<int>(col);
+                assignment[row] = val >-1 ? val : unassignedLabel;
                 break;
             }
         }

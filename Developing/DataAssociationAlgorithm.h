@@ -46,7 +46,9 @@ public:
         without_forbidden_assignments
     };
 
-    DataAssociationAlgorithm();
+    int unassignedLabel;
+
+    DataAssociationAlgorithm(int unassignedLabel);
     ~DataAssociationAlgorithm();
 
     track_t solve(const distMatrix_t &distMatrixIn, size_t nOfRows, size_t nOfColumns, assignments_t &assignment,

@@ -50,6 +50,9 @@ public:
     };
 
     std::vector<std::unique_ptr<Track>> tracks;
+    std::vector<std::unique_ptr<Track>> oldTracks;
+
+
     /**
    * Class for handling occlusions
    */
