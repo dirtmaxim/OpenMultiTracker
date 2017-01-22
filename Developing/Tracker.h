@@ -15,7 +15,7 @@
 #include <array>
 #include "../Utils/defines.h"
 #include "Track.h"
-#include "../Utils/OcclusionHandler.h"
+#include "OcclusionHandler.h"
 #include "ObjectState.h"
 
 typedef float track_t;

@@ -1,5 +1,5 @@
 #include "RinkBackgroundSubtractor.h"
-#include "Utils/OcclusionHandler.h"
+#include "Developing/OcclusionHandler.h"
 #include "Developing/Tracker.h"
 #include "Utils/RegionChooser.h"
 #include <vector>

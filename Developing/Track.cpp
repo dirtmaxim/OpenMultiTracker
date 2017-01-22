@@ -38,8 +38,7 @@
         trace.push_back(prediction);
     }
 
-    cv::Rect Track::getLastRect()
-    {
+    cv::Rect Track::getLastRect()const {
         return cv::Rect(
                 static_cast<int>(prediction.x - lastRect.width / 2),
                 static_cast<int>(prediction.y - lastRect.height / 2),

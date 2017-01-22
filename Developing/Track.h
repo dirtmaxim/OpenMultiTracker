@@ -42,7 +42,7 @@ public:
      */
     void update(const ObjectState &p, bool dataCorrect, size_t max_trace_length);
 
-    cv::Rect getLastRect();
+    cv::Rect getLastRect()const;
 
     Point_t getPrediction();
 

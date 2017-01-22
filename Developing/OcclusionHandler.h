@@ -7,7 +7,8 @@
 
 
 #include <opencv2/core/types.hpp>
-#include "../Developing/Track.h"
+#include "Track.h"
+#include "AssignmentsTable.h"
 
 class OcclusionHandler {
 private:
@@ -38,10 +39,10 @@ public:
 
     /**
      * Finds all splits on the frame according to the intersection rule
-     * @param blobs - current frame's blobs
+     * @param detections - current frame's blobs
      * @return - collcection of all merged blobs of previous frame that were splitted in the current one
      */
-    std::vector<cv::Rect> findAllSplits(std::vector<cv::Rect> blobs);
+    std::vector<cv::Rect> findAllSplits(std::vector<cv::Rect> detections);
 
     /**
      * Fills  buffer with blobs
@@ -49,7 +50,7 @@ public:
      */
     void fillBuffer(std::vector<ObjectState> buffer);
 
-    void update(std::vector<Track> tracks);
+    void update(AssignmentsTable &assignments, const std::vector<ObjectState> &detections, std::vector<std::unique_ptr<Track>> &tracks);
 };
 
 
