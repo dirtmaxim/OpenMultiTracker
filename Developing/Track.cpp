@@ -3,15 +3,14 @@
 //
 #include "Track.h"
 
-    Track::Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> RelatedTracks):
+    Track::Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> &RelatedTracks):
             track_id(trackID),
             skipped_frames(0),
             prediction(p.coord()),
             lastRect(p.boundingBox()),
             motionModel(p.coord(), dt, Accel_noise_mag),
             relatedTracks(RelatedTracks)
-    {
-    }
+    {}
 
     /**
      * Method that performs all basic steps of track management and model maintenace.
@@ -56,3 +55,21 @@ track_t Track::calculateDistance(const ObjectState &p) {
     Point_t diff = prediction - p.coord();
     return sqrtf(diff.x * diff.x + diff.y * diff.y);
 }
+
+Track::Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID, int RelatedTrack) :
+        track_id(trackID),
+        skipped_frames(0),
+        prediction(p.coord()),
+        lastRect(p.boundingBox()),
+        motionModel(p.coord(), dt, Accel_noise_mag)
+{
+    relatedTracks.push_back(RelatedTrack);
+}
+
+Track::Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID) :
+        track_id(trackID),
+        skipped_frames(0),
+        prediction(p.coord()),
+        lastRect(p.boundingBox()),
+        motionModel(p.coord(), dt, Accel_noise_mag)
+{}

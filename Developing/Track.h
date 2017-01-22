@@ -17,11 +17,13 @@
 class Track {
 public:
     std::vector<Point_t> trace; //previous states of the tracked object
-    std::vector<int> relatedTracks; //tracks that are connected with this track
     size_t track_id;
     size_t skipped_frames;
 
-    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> RelatedTracks = {0});
+    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> &RelatedTracks);
+    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, int RelatedTrack);
+    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID);
+
 
     /**
      * Method for calculating distance between points in the feature space. Used for distance between centroid of
@@ -48,6 +50,8 @@ private:
     Point_t prediction; // predicted new state for the track
     cv::Rect lastRect;
     MotionModel motionModel; // filter for motion model
+
+    std::vector<int> relatedTracks; //tracks that are connected with this track
 };
 
 

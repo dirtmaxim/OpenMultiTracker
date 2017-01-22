@@ -108,6 +108,7 @@ public:
 
         //occlusion handling works with detectionsToTracks and tracksToDetections
 
+
         // Form transformation vectors
         for (int i = 0; i < detectionsToTracks.size(); ++i) {
             if (detectionsToTracks[i].type == Unassigned) {
@@ -122,13 +123,13 @@ public:
         }
 
         // Build cost matrix (costAdj) only for unassigned tracks and detections
-        size_t NAdj = actualRows.size();
-        size_t MAdj = actualCols.size();
+        size_t MAdj = actualRows.size();
+        size_t NAdj = actualCols.size();
         distMatrix_t costAdj(NAdj * MAdj);
 
-        for (int i = 0; i < NAdj; ++i) {
-            for (int j = 0; j < MAdj; ++j) {
-                costAdj[i * NAdj + j] = costMatrix[actualRows[i] * M + actualRows[j]];
+        for (int i = 0; i < MAdj; ++i) {
+            for (int j = 0; j < NAdj; ++j) {
+                costAdj[i * NAdj + j] = costMatrix[actualRows[i] * N + actualCols[j]];
             }
         }
 
@@ -143,7 +144,7 @@ public:
         // -----------------------------------
         for (size_t i = 0; i < assignmentVector.size(); i++) {
             if (assignmentVector[i] != Unassigned) {
-                if (costAdj[i + assignmentVector[i] * NAdj] > distanceThreshold) {
+                if (costAdj[i*NAdj + assignmentVector[i]] > distanceThreshold) {
                     assignmentVector[i] = Unassigned;
 //                    tracksToDetections[actualCols[i]]->skipped_frames = 1;
                 }
@@ -263,25 +264,25 @@ void Tracker::update(
          */
         // Check for collisions
         // Find merges on the video
-        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(detections);
-
-
-        // Find splits on the video
-//        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(detections);
-        {
-            for (int i = 0; i < merges.size(); ++i) {
-                rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
-            }
+//        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(detections);
 //
-//        for (int i = 0; i < splits.size(); ++i) {
-//            cv::rectangle(*imgOutput, splits[i], cv::Scalar(0, 255, 255), 3);
-//        }
-
+//
+//        // Find splits on the video
+////        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(detections);
+//        {
+//            for (int i = 0; i < merges.size(); ++i) {
+//                rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
+//            }
+////
+////        for (int i = 0; i < splits.size(); ++i) {
+////            cv::rectangle(*imgOutput, splits[i], cv::Scalar(0, 255, 255), 3);
+////        }
+//
             // Show previous frames in green rectangles
             for (int i = 0; i < occlusionHandler.buffer.size(); ++i) {
                 rectangle(*imgOutput, occlusionHandler.buffer[i].boundingBox(), cv::Scalar(0, 255, 0), 1);
             }
-        }
+//        }
         /**
          * ================================================================================
          */
@@ -346,7 +347,7 @@ void Tracker::update(
     }
 
     // -----------------------------------
-    // Step 3b: Track Initiation and Removal for all the merged and spliited tracks.
+    // Step 3b: Track Initiation and Removal for all the merged and splitted tracks.
     // -----------------------------------
 
     std::set<int> tracksToRemove;
@@ -355,21 +356,26 @@ void Tracker::update(
         int detectionType = assignments.detectionsToTracks[i].type;
         if (detectionType ==
             Assignments::Merged) { //add new track initialized by detection and merged tracks and delete all the merged tracks
+            std::vector<int> relatedTracks;
             for (int track : assignments.detectionsToTracks[i].additionalAssignments) {
+                relatedTracks.push_back(track);
                 tracksToRemove.insert(track);
             }
             tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag,
-                                                     NextTrackID++)); //TODO: add track constructor with n tracks
-        } else {
+                                                     NextTrackID++, relatedTracks)); //TODO: add track constructor with n tracks
+        } else if (detectionType >= 0){
             if (assignments.tracksToDetections[detectionType].type ==
                 Assignments::Splitted) { //if the detection is assigned to track which is splitted then remove previous track and initialize new from it.
-                tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++));
+                tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++, detectionType));
+                tracksToRemove.insert(detectionType);
             }
-            tracksToRemove.insert(detectionType);
         }
     }
 
-
+    // Mark tracks to remove with label ToRemove
+    for (int i : tracksToRemove) {
+        assignments.tracksToDetections[i].type = Assignments::ToRemove;
+    }
 
     // -----------------------------------
     // Step 4: Track Smoothing. Update Kalman Filter's state
@@ -399,21 +405,15 @@ void Tracker::update(
         }
     }
 
-
-    // Mark tracks to remove with label ToRemove
-    for (int i : tracksToRemove) {
-        assignments.tracksToDetections[i].type = Assignments::ToRemove;
-    }
-
     // Delete all the tracks with label ToRemove
-    for (int i = 0; i < static_cast<int>(tracks.size()); i++) {
+    for (int i = 0; i < assignments.tracksToDetections.size(); i++) {
         if (assignments.tracksToDetections[i].type == Assignments::ToRemove){
             tracks.erase(tracks.begin() + i);
             assignments.tracksToDetections.erase(assignments.tracksToDetections.begin() + i);
             i--;
         }
     }
-    
+
     occlusionHandler.fillBuffer(detections);
 }
 
@@ -422,6 +422,8 @@ void Tracker::update(
 // ---------------------------------------------------------------------------
 Tracker::~Tracker(void) {
 }
+
+
 
 /**
  * TODO:
