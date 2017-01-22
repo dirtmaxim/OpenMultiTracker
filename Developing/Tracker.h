@@ -40,25 +40,11 @@ public:
 
     ~Tracker(void);
 
-    /**
-     * Enum for selection of the type of distance calculation
-     */
-    enum DistType
-    {
-        CentersDist = 0,
-        RectsDist = 1
-    };
-
     std::vector<std::unique_ptr<Track>> tracks;
     std::vector<std::unique_ptr<Track>> oldTracks;
 
-
-    /**
-   * Class for handling occlusions
-   */
     OcclusionHandler occlusionHandler;
 
-    //TODO: remake with variable number of arguments, including the rectangles of different detections that should be represented on the video
     void update(const std::vector<ObjectState>& detections, cv::Mat* imgOutput);
 
 private:

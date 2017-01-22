@@ -86,29 +86,15 @@ void Tracker::update(
             }
         }
 
-        // =========================== Add occlusion handling ==========================
+        // Find occlusions
         occlusionHandler.update(assignments, detections, tracks);
 
-
+        // Process the data association algorithm
         assignments.solve(Cost, (int) N, (int) M);
-
-
 
         // -----------------------------------
         // Step 2: Track removal. If track didn't get detects long time, remove it.
         // -----------------------------------
-////        for (int i = 0; i < static_cast<int>(tracks.size()); i++) {
-////            if (tracks[i]->skipped_frames > maximum_allowed_skipped_frames) {
-////                tracks.erase(tracks.begin() + i);
-////                assignmentVector.erase(assignmentVector.begin() + i);
-////                i--;
-////            }
-////        }
-//        for (int i = 0; i < static_cast<int>(tracks.size()); i++) {
-//            if (tracks[i]->skipped_frames > maximum_allowed_skipped_frames) {
-//                assignments.tracksToDetections[i].type = Assignments::ToRemove;
-//            }
-//        }
 
         for (int i = 0; i < assignments.tracksToDetections.size(); ++i) {
             if (assignments.tracksToDetections[i].type == AssignmentsTable::Unassigned) {
@@ -123,11 +109,7 @@ void Tracker::update(
     // -----------------------------------
     // Step 3a: Track Initiation. Search for unassigned detects and start new tracks for them.
     // -----------------------------------
-//    for (size_t i = 0; i < detections.size(); ++i) {
-//        if (find(assignmentVector.begin(), assignmentVector.end(), i) == assignmentVector.end()) {
-//            tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++));
-//        }
-//    }
+
     for (size_t i = 0; i < detections.size(); ++i) {
         if (assignments.detectionsToTracks[i].type == AssignmentsTable::Unassigned) {
             tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++));
@@ -168,17 +150,7 @@ void Tracker::update(
     // -----------------------------------
     // Step 4: Track Smoothing. Update Kalman Filter's state
     // -----------------------------------
-//    for (size_t i = 0; i < assignmentVector.size(); i++) {
-//        // If track updated less than one time, than filter state is not correct.
-//        if (assignmentVector[i] != -1) // If we have assigned detect, then update the filter using its coordinates,
-//        {
-//            tracks[i]->skipped_frames = 0;
-//            tracks[i]->update(detections[assignmentVector[i]], true, max_trace_length);
-//        } else                     // if not continue using predictions of filter
-//        {
-//            tracks[i]->update(Point_t(), false, max_trace_length);
-//        }
-//    }
+
     for (size_t i = 0; i < assignments.tracksToDetections.size(); i++) {
         // If track updated less than one time, than filter state is not correct.
         int detectionType = assignments.tracksToDetections[i].type;
@@ -210,15 +182,6 @@ void Tracker::update(
 // ---------------------------------------------------------------------------
 Tracker::~Tracker(void) {
 }
-
-
-
-/**
- * TODO:
- * 1. Add track constructor with related tracks
- * 2. Add update method for the occlusion handler
- * 3.
- */
 
 
 

@@ -19,7 +19,29 @@ void AssignmentsTable::solve(distMatrix_t &costMatrix, int N, int M) {
     std::vector<int> actualRows; //positions of unassigned detections
     std::vector<int> actualCols; //positions of unassigned tracks
 
-    //occlusion handling works with detectionsToTracks and tracksToDetections
+    /**
+    * Transformation vectors maps elements of a matrix that contains only specific rows and columns of full matrix
+    * to the corresponding elements of the full matrix.
+    *
+    * Full:
+    *    1  2  3  4
+    *   ------------
+    * 1| A  B  C  D
+    * 2| E  F  G  H
+    * 3| J  K  L  M
+    * 4| N  O  P  Q
+    *
+    * Partial:
+    *       1(1)  2(3)  3(4)
+    *      ----------------
+    * 1(2)|  E     G     H
+    * 2(4)|  N     P     Q
+    *
+    * Transformation vectors:
+    * actualRows: [1] = 2, [2] = 4
+    * actualCols: [1] = 1, [2] = 3, [3] = 4
+    */
+
 
     // Form transformation vectors
     // Returns positions of the detections and tracks which are not in the occlusions in the initial Cost matrix
@@ -59,12 +81,7 @@ void AssignmentsTable::solve(distMatrix_t &costMatrix, int N, int M) {
         if (assignmentVector[i] != Unassigned) {
             if (costAdj[i + assignmentVector[i] * NAdj] > distanceThreshold) {
                 assignmentVector[i] = Unassigned;
-//                    tracksToDetections[actualCols[i]]->skipped_frames = 1;
             }
-//            } else {
-//                // If track have no assigned detect, then increment skipped frames counter.
-//                assignmentVector[i] = Unassigned;
-////                tracks[actualCols[i]]->skipped_frames++;
         }
     }
 
