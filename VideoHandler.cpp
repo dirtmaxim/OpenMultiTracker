@@ -155,8 +155,13 @@ void VideoHandler::handle() {
             }
         }
 
+        // Show previous frames in green rectangles
+        for (int i = 0; i < tracker.tracks.size(); ++i) {
+            rectangle(*img_output, tracker.tracks[i]->getLastRect(), cv::Scalar(0, 255, 0), 1);
+        }
+
         //===============================Testing====================================
-        tracker.update(m_rects, img_output);
+        tracker.update(m_rects);
         for (auto p : m_centers)
         {
             cv::circle(*img_output, p, 3, cv::Scalar(0, 255, 0), 1, CV_AA);
@@ -170,11 +175,12 @@ void VideoHandler::handle() {
             {
                 for (int j = 0; j < tracker.tracks[i]->trace.size() - 1; j++)
                 {
-                    cv::line(*img_output, tracker.tracks[i]->trace[j], tracker.tracks[i]->trace[j + 1], Colors[tracker.tracks[i]->track_id % 9], 2, CV_AA);
+                    cv::line(*img_output, tracker.tracks[i]->trace[j].coord(), tracker.tracks[i]->trace[j + 1].coord(), Colors[tracker.tracks[i]->track_id % 9], 2, CV_AA);
                 }
             }
         }
         //===============================Testing====================================
+
         if (this->showSystemInformation) {
             // Show system information.
             cv::putText(*img_output, std::string("Frame: ") + std::to_string((int) this->videoCapture.get(CV_CAP_PROP_POS_FRAMES)),
@@ -183,14 +189,6 @@ void VideoHandler::handle() {
 
         cv::imshow("HockeyPlayerDetector", *img_output);
 
-        // Pause video to show occlusions
-//        if (merges.size()>0 || splits.size()>0){
-//            if (writeOutput) {
-//                std::string image = "output/occlusions/img" + std::to_string(written_image_counter++) + ".png";
-//                cv::imwrite(image, *img_output);
-//            }
-//            cv::waitKey(0);
-//        }
         // Video speed according to fps.
         int code = cv::waitKey(fps);
 

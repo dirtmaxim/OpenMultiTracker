@@ -4,10 +4,6 @@
 
 #include "OcclusionHandler.h"
 
-void OcclusionHandler::fillBuffer(std::vector<ObjectState> buffer) {
-    this->buffer = buffer;
-}
-
 void OcclusionHandler::update(AssignmentsTable &assignments, const std::vector<ObjectState> &detections,
                               std::vector<std::unique_ptr<Track>> &tracks) {
 
@@ -19,7 +15,7 @@ void OcclusionHandler::update(AssignmentsTable &assignments, const std::vector<O
     // Fill the intersection area matrix. It contains the pairwise interesection area of all the detections and tracks.
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            intersectionArea[i + j * N] = (tracks[i]->getLastRect() & detections[j].boundingBox()).area();
+            intersectionArea[i + j * N] = (tracks[i]->getLastPredictedRect() & detections[j].boundingBox()).area();
         }
     }
 

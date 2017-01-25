@@ -16,7 +16,7 @@
  */
 class Track {
 public:
-    std::vector<Point_t> trace; //previous states of the tracked object
+    std::vector<ObjectState> trace; //previous states of the tracked object
     size_t track_id;
     size_t skipped_frames;
 
@@ -35,23 +35,22 @@ public:
 
     /**
      * Method that performs all basic steps of track management and model maintenace.
-     * @param p
-     * @param rect
-     * @param dataCorrect
-     * @param max_trace_length
+     * @param p - new measurement
+     * @param dataCorrect - true if the measurement is valid
+     * @param max_trace_length - number of steps in the trace of the object
      */
     void update(const ObjectState &p, bool dataCorrect, size_t max_trace_length);
 
-    cv::Rect getLastRect()const;
+    cv::Rect getLastPredictedRect()const;
 
-    Point_t getPrediction();
+    cv::Rect getLastRect();
 
 private:
     Point_t prediction; // predicted new state for the track
-    cv::Rect lastRect;
+    cv::Rect lastRect; //
     MotionModel motionModel; // filter for motion model
 
-    std::vector<int> relatedTracks; //tracks that are connected with this track
+    std::vector<int> relatedTracks; //tracks-predecessors of the current track
 };
 
 

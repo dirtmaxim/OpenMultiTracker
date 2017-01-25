@@ -2,7 +2,6 @@
 // Created by Ars Poyezzhayev on 06.12.16.
 //
 #include "Tracker.h"
-#include "AssignmentsTable.h"
 
 // ---------------------------------------------------------------------------
 // Tracker manager tracks. Create, remove, update.
@@ -32,8 +31,7 @@ Tracker::Tracker() {}
 //                                  Methods
 // ---------------------------------------------------------------------------
 void Tracker::update(
-        const std::vector<ObjectState> &detections,
-        cv::Mat *imgOutput) {
+        const std::vector<ObjectState> &detections) {
 
     size_t N = tracks.size();        // tracks
     size_t M = detections.size();    // detects
@@ -43,36 +41,6 @@ void Tracker::update(
     if (!tracks.empty()) {
         // Matrix of distance between N-th track and M-th detection.
         distMatrix_t Cost(N * M);
-
-        /**
-         * ================================================================================
-         * Temporary collision detection
-         * ================================================================================
-         */
-        // Check for collisions
-        // Find merges on the video
-//        std::vector<cv::Rect> merges = occlusionHandler.findAllMerges(detections);
-//
-//
-//        // Find splits on the video
-////        std::vector<cv::Rect> splits = occlusionHandler.findAllSplits(detections);
-//        {
-//            for (int i = 0; i < merges.size(); ++i) {
-//                rectangle(*imgOutput, merges[i], cv::Scalar(0, 0, 255), 3, cv::LINE_4);
-//            }
-////
-////        for (int i = 0; i < splits.size(); ++i) {
-////            cv::rectangle(*imgOutput, splits[i], cv::Scalar(0, 255, 255), 3);
-////        }
-//
-            // Show previous frames in green rectangles
-            for (int i = 0; i < occlusionHandler.buffer.size(); ++i) {
-                rectangle(*imgOutput, occlusionHandler.buffer[i].boundingBox(), cv::Scalar(0, 255, 0), 1);
-            }
-//        }
-        /**
-         * ================================================================================
-         */
 
         // -----------------------------------
         // Step 1: Plot to Track Association. Fill the distance matrix with values
@@ -117,7 +85,7 @@ void Tracker::update(
     }
 
     // -----------------------------------
-    // Step 3b: Track Initiation and Removal for all the merged and splitted tracks.
+    // Step 3b: Track Initiation and Removal for all the merged and split tracks.
     // -----------------------------------
 
     std::set<int> tracksToRemove;
@@ -148,7 +116,7 @@ void Tracker::update(
     }
 
     // -----------------------------------
-    // Step 4: Track Smoothing. Update Kalman Filter's state
+    // Step 4: Track Smoothing. update Kalman Filter's state
     // -----------------------------------
 
     for (size_t i = 0; i < assignments.tracksToDetections.size(); i++) {
@@ -161,7 +129,7 @@ void Tracker::update(
         } else if (detectionType ==
                    AssignmentsTable::Unassigned)                  // if not continue using predictions of filter
         {
-            tracks[i]->update(Point_t(), false, max_trace_length);
+            tracks[i]->update(ObjectState(), false, max_trace_length);
         }
     }
 
@@ -173,8 +141,6 @@ void Tracker::update(
             i--;
         }
     }
-
-    occlusionHandler.fillBuffer(detections);
 }
 
 // ---------------------------------------------------------------------------

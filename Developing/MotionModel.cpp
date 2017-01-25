@@ -16,9 +16,9 @@ MotionModel::MotionModel(Point_t pt, track_t dt, track_t Accel_noise_mag)
     deltatime = dt; //0.2
 
     // We don't know acceleration, so, assume it to process noise.
-    // But we can guess, the range of acceleration values thich can be achieved by tracked object.
+    // But we can guess, the range of acceleration values which can be achieved by tracked object.
     // Process noise. (standard deviation of acceleration: m/s^2)
-    // shows, woh much target can accelerate.
+    // shows, how much target can accelerate.
     //track_t Accel_noise_mag = 0.5;
 
     //4 state variables, 2 measurements
@@ -27,7 +27,7 @@ MotionModel::MotionModel(Point_t pt, track_t dt, track_t Accel_noise_mag)
     kalman->transitionMatrix = (cv::Mat_<track_t>(4, 4) << 1, 0, deltatime, 0, 0, 1, 0, deltatime, 0, 0, 1, 0, 0, 0, 0, 1);
 
     // init...
-    LastResult = pt;
+    predictedState = pt;
     kalman->statePre.at<track_t>(0) = pt.x; // x
     kalman->statePre.at<track_t>(1) = pt.y; // y
 
@@ -64,28 +64,29 @@ MotionModel::~MotionModel()
 
 /**
  * Method that estimates the new state of the object
- * @return position
  */
-Point_t MotionModel::GetPrediction()
+void MotionModel::predict()
 {
     cv::Mat prediction = kalman->predict();
-    LastResult = Point_t(prediction.at<track_t>(0), prediction.at<track_t>(1));
-    return LastResult;
+    predictedState = Point_t(prediction.at<track_t>(0), prediction.at<track_t>(1)); // predict x and y coord of position
 }
 
 /**
- * Update the model of Kalman Filter
- * @param p
- * @param DataCorrect
+ * Update the model of Kalman Filter with new data.
+ * @param p - state of new data
+ * @param DataCorrect - if true than the filter is updated with the real data.
  * @return
  */
-Point_t MotionModel::Update(Point_t p, bool DataCorrect)
+Point_t MotionModel::update(Point_t p, bool DataCorrect)
 {
+    predict();
+
     cv::Mat measurement(2, 1, Mat_t(1));
-    if(!DataCorrect)
+
+    if(!DataCorrect) // if not appropriate measurement
     {
-        measurement.at<track_t>(0) = LastResult.x;  //update using prediction
-        measurement.at<track_t>(1) = LastResult.y;
+        measurement.at<track_t>(0) = predictedState.x;  //update using prediction
+        measurement.at<track_t>(1) = predictedState.y;
     }
     else
     {
@@ -93,9 +94,9 @@ Point_t MotionModel::Update(Point_t p, bool DataCorrect)
         measurement.at<track_t>(1) = p.y;
     }
     // Correction
-    cv::Mat estimated = kalman->correct(measurement);
-    LastResult.x = estimated.at<track_t>(0);   //update using measurements
-    LastResult.y = estimated.at<track_t>(1);
-    return LastResult;
+    cv::Mat estimated = kalman->correct(measurement); // adjust the filter and estimate state of the object by weight summing of the prediction and measured state
+    predictedState.x = estimated.at<track_t>(0); // adjust predicted state by using the actual measurement
+    predictedState.y = estimated.at<track_t>(1);
+    return predictedState;
 }
 //---------------------------------------------------------------------------

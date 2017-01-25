@@ -69,13 +69,15 @@ class AssignmentsTable {
 
 
 public:
+
     track_t distanceThreshold;
 
     std::vector <Assignment> tracksToDetections;
     std::vector <Assignment> detectionsToTracks;
 
-    // special types of assignments. The Assigned type is not specific, it's just a number of an assignment
+    // Special types of assignments. The Assigned type is not specific, it's just a number of a related assignment.
     enum type {
+        // Assigned >= 0,
         Unassigned = -1,
         Merged = -2,
         Splitted = -3,
@@ -85,6 +87,12 @@ public:
 
 public:
 
+    /**
+     *
+     * @param tracksSize
+     * @param detectionsSize
+     * @param distanceThreshold
+     */
     AssignmentsTable (size_t tracksSize, size_t detectionsSize, track_t distanceThreshold);
 
     void solve(distMatrix_t &costMatrix, int N, int M);
@@ -94,8 +102,6 @@ public:
     void merge(std::vector<int> &tracks, int detection);
 
     void split(std::vector<int> &detections, int track);
-
-
 };
 
 

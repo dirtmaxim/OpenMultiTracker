@@ -45,7 +45,7 @@ public:
 
     OcclusionHandler occlusionHandler;
 
-    void update(const std::vector<ObjectState>& detections, cv::Mat* imgOutput);
+    void update(const std::vector<ObjectState>& detections);
 
 private:
     // The update frequency of the filter

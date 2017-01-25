@@ -15,14 +15,12 @@ private:
     float mergeThreshold = 100;
 
 public:
-    std::vector<ObjectState> buffer;
-
     /**
-     * Fills  buffer with blobs
-     * @param buffer
+     * Updates the assignments table with merges and splits.
+     * @param assignments - assignment table which we need to update
+     * @param detections - list of current detections
+     * @param tracks - list of current tracks
      */
-    void fillBuffer(std::vector<ObjectState> buffer);
-
     void update(AssignmentsTable &assignments, const std::vector<ObjectState> &detections, std::vector<std::unique_ptr<Track>> &tracks);
 };
 
