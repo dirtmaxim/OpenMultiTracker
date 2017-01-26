@@ -20,6 +20,7 @@ public:
     size_t track_id;
     size_t skipped_frames;
 
+
     Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> &RelatedTracks);
     Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, int RelatedTrack);
     Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID);
@@ -51,6 +52,7 @@ private:
     MotionModel motionModel; // filter for motion model
 
     std::vector<int> relatedTracks; //tracks-predecessors of the current track
+    std::vector<size_t> possible_ids;
 };
 
 
