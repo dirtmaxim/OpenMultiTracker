@@ -1,4 +1,7 @@
 #include "RinkBackgroundSubtractor.h"
+#include "Developing/OcclusionHandler.h"
+#include "Developing/Tracker.h"
+#include "Utils/RegionChooser.h"
 #include <vector>
 
 /**
@@ -17,6 +20,11 @@ private:
     RinkBackgroundSubtractor rinkBackgroundSubtractor;
 
     /**
+     * Class for tracking management
+     */
+     Tracker tracker;
+
+    /**
      * Region of interess. It will be loaded from file at first start
      * if file exists or user will be able to create new one by RegionChooser automatical usage.
      */
@@ -27,6 +35,16 @@ private:
      * 0 - original, 1 - background subtraction, 2 - contoured image.
      */
     int mode;
+
+    /**
+     * Write output information
+     */
+    bool writeOutput = false;
+
+    /**
+     * Write directory
+     */
+    std::string writeDirectory;
 
     /**
      * Show system information of process in the left top corner.
@@ -70,7 +88,7 @@ public:
      *
      * @param file_name Name of video file with hockey game.
      */
-    VideoHandler(char const*);
+    VideoHandler(char const*, int = 0, char*[] = nullptr);
 
     /**
      * Handle the video stream using necessary classes.

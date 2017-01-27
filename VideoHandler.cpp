@@ -1,5 +1,5 @@
 #include "VideoHandler.h"
-#include "RegionChooser.h"
+
 
 cv::Mat VideoHandler::chooseRegion(cv::Mat img_input) {
     RegionChooser regionChooser(img_input);
@@ -13,12 +13,16 @@ cv::Mat VideoHandler::chooseRegion(cv::Mat img_input) {
     return region;
 }
 
-VideoHandler::VideoHandler(char const* file_name) {
+VideoHandler::VideoHandler(char const* file_name, int argc, char *argv[]) {
     this->videoCapture = cv::VideoCapture(file_name);
+//    this->occlusionHandler = OcclusionHandler();
     this->width = (int) videoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
     this->height = (int) videoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
     this->fps = (int) videoCapture.get(CV_CAP_PROP_FPS);
-    this->region = cv::imread("region.png", CV_8UC1);
+//    this->fps = 500;
+    this->region = cv::imread("input/region.png", CV_8UC1);
+
+
 
     // Show original image with found rectangles.
     this->mode = 0;
@@ -28,7 +32,6 @@ VideoHandler::VideoHandler(char const* file_name) {
         cv::Mat first_frame;
         bool isSuccess = this->videoCapture.read(first_frame);
         if (isSuccess) {
-
             // Resize the frame.
             cv::resize(first_frame, first_frame,
                        cv::Size(this->truncatedWidth, (int) ((float) this->truncatedWidth / this->width * this->height)));
@@ -41,7 +44,17 @@ VideoHandler::VideoHandler(char const* file_name) {
             } while (code == 82 || code == 114);
 
             this->region = region;
-            cv::imwrite("region.png", this->region);
+            cv::imwrite("input/region.png", this->region);
+        }
+    }
+
+    //Set up the write output
+    if (argc>0){
+        if (argv[0] == "-write"){
+            writeOutput = true;
+            writeDirectory = "/output/occlusionHandling";
+        } else{
+            std::cout << "Unknown parameter name" << std::endl;
         }
     }
 }
@@ -49,13 +62,23 @@ VideoHandler::VideoHandler(char const* file_name) {
 void VideoHandler::handle() {
     // Set position pointer of video stream to the first frame.
     this->videoCapture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    //Counter of images to write
+    int written_image_counter = 0;
+    Tracker tracker(0.2f, 1.5f, 60.0f, 10, 50);
+
+    cv::Scalar Colors[100];
+    for (int k = 0; k < 100; ++k) {
+        Colors[k] = cv::Scalar(rand()%256,rand()%256,rand()%256);
+    }
 
     while (true) {
         cv::Mat img_input;
         cv::Mat original_img_input;
         cv::Mat processed_img_input;
         cv::Mat contoured_img_input;
+        cv::Mat blobs_labeled_img;
         cv::Mat* img_output = NULL;
+        std::vector<cv::Rect> currentBlobs;
 
         if (this->mode == 0) {
             img_output = &original_img_input;
@@ -101,16 +124,62 @@ void VideoHandler::handle() {
         // Find contours of blobs.
         cv::findContours(contoured_img_input, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
+        // Apply blobs' mask to the input image
+        img_input.copyTo(blobs_labeled_img, processed_img_input);
+
+        //Another insert
+        std::vector<ObjectState> m_rects;
+        std::vector<Point_t> m_centers;
+
         for(auto contour: contours) {
-            if (cv::contourArea(contour) > 350) {
+            if (cv::contourArea(contour) > 300) {
 
                 // Find bounding rect of contour.
                 cv::Rect rect = cv::boundingRect(contour);
+                //Insert
+                m_rects.push_back(ObjectState(rect));
+                m_centers.push_back((rect.br() + rect.tl())*0.5);
+
+                // Append new rectangle to currentBlobs
+                currentBlobs.push_back(rect);
 
                 // Draw rectangle on the blob.
-                cv::rectangle(*img_output, rect, cv::Scalar(255, 0, 0));
+                cv::rectangle(*img_output, rect, cv::Scalar(255, 0, 0), 0);
+
+                //Save detected object image to the /output dir
+//                if (writeOutput) {
+//                    cv::Mat roiImg = cv::Mat(blobs_labeled_img, rect);
+//                    std::string image = "output/occlusions/img" + std::to_string(written_image_counter++) + ".png";
+//                    cv::imwrite(image, roiImg);
+//                }
             }
         }
+
+        // Show previous frames in green rectangles
+        for (int i = 0; i < tracker.tracks.size(); ++i) {
+            rectangle(*img_output, tracker.tracks[i]->getLastRect(), cv::Scalar(0, 255, 0), 1);
+        }
+
+        //===============================Testing====================================
+        tracker.update(m_rects);
+        for (auto p : m_centers)
+        {
+            cv::circle(*img_output, p, 3, cv::Scalar(0, 255, 0), 1, CV_AA);
+        }
+
+        std::cout << tracker.tracks.size() << std::endl;
+
+        for (int i = 0; i < tracker.tracks.size(); i++)
+        {
+            if (tracker.tracks[i]->trace.size() > 1)
+            {
+                for (int j = 0; j < tracker.tracks[i]->trace.size() - 1; j++)
+                {
+                    cv::line(*img_output, tracker.tracks[i]->trace[j].coord(), tracker.tracks[i]->trace[j + 1].coord(), Colors[tracker.tracks[i]->track_id % 9], 2, CV_AA);
+                }
+            }
+        }
+        //===============================Testing====================================
 
         if (this->showSystemInformation) {
             // Show system information.
@@ -135,7 +204,7 @@ void VideoHandler::handle() {
             // then save region and update method of subtraction.
             if (code != 27) {
                 this->region = region;
-                cv::imwrite("region.png", this->region);
+                cv::imwrite("input/region.png", this->region);
             }
         // If user presses 'O' or 'o', then activate original video.
         } else if (code == 79 || code == 111) {
@@ -162,3 +231,4 @@ void VideoHandler::handle() {
 VideoHandler::~VideoHandler() {
     cv::destroyAllWindows();
 }
+

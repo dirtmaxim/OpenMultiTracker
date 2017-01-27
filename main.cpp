@@ -5,8 +5,10 @@ void help();
 
 int main() {
     help();
-    VideoHandler videoHandler("hockey_game.avi");
+    char* params[] = {"-wte"};
+    VideoHandler videoHandler("input/hockey_game.avi", 1, params);
     videoHandler.handle();
+
     return 0;
 }
 
