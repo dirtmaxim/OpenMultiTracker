@@ -1,4 +1,4 @@
-# HockeyPlayersDetector
+# OpenMultiTracker
 
 ##### It uses computer vision methods to detect players on the hockey field.
 
