@@ -71,7 +71,7 @@ private:
      * Height will be truncated in proportional manner.
      * If you have intention to change this parameter, delete region.png at first.
      */
-    const int truncatedWidth = 800;
+    const int truncatedWidth = 1448;
 
     /**
      *

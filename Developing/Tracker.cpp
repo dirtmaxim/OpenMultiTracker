@@ -94,9 +94,9 @@ void Tracker::update(
         int detectionType = assignments.detectionsToTracks[i].type;
         if (detectionType ==
             AssignmentsTable::Merged) { //add new track initialized by detection and merged tracks and delete all the merged tracks
-            std::vector<int> relatedTracks;
+            std::vector<size_t> relatedTracks;
             for (int track : assignments.detectionsToTracks[i].additionalAssignments) {
-                relatedTracks.push_back(track);
+                relatedTracks.push_back(tracks[track]->track_id);
                 tracksToRemove.insert(track);
             }
             tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag,
@@ -104,7 +104,7 @@ void Tracker::update(
         } else if (detectionType >= 0){
             if (assignments.tracksToDetections[detectionType].type ==
                 AssignmentsTable::Splitted) { //if the detection is assigned to track which is splitted then remove previous track and initialize new from it.
-                tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++, detectionType));
+                tracks.push_back(std::make_unique<Track>(detections[i], dt, Accel_noise_mag, NextTrackID++, tracks[detectionType]->track_id));
                 tracksToRemove.insert(detectionType);
             }
         }

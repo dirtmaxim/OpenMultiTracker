@@ -25,7 +25,7 @@ void OcclusionHandler::update(AssignmentsTable &assignments, const std::vector<O
         for (int j = 0; j < N; j++) {
             if (intersectionArea[i * N + j] > mergeThreshold) tracksMerged.push_back(j);
         }
-        if(tracksMerged.size() > 1){
+        if (tracksMerged.size() > 1) {
             assignments.merge(tracksMerged, i);
         }
     }
@@ -34,9 +34,9 @@ void OcclusionHandler::update(AssignmentsTable &assignments, const std::vector<O
     for (int i = 0; i < N; i++) {
         std::vector<int> detectionsOfSplittedTrack;
         for (int j = 0; j < M; j++) {
-            if (intersectionArea[i + j*N] > mergeThreshold) detectionsOfSplittedTrack.push_back(j);
+            if (intersectionArea[i + j * N] > mergeThreshold) detectionsOfSplittedTrack.push_back(j);
         }
-        if(detectionsOfSplittedTrack.size() > 1){
+        if (detectionsOfSplittedTrack.size() > 1) {
             assignments.split(detectionsOfSplittedTrack, i);
         }
     }

@@ -4,7 +4,8 @@
 #include "Track.h"
 
 // ======================================Constructors======================================
-    Track::Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> &RelatedTracks):
+    Track::Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID,
+                 std::vector<size_t> &RelatedTracks):
             track_id(trackID),
             skipped_frames(0),
             prediction(p.coord()),
@@ -13,7 +14,7 @@
             relatedTracks(RelatedTracks)
     {}
 
-    Track::Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID, int RelatedTrack) :
+    Track::Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID, size_t RelatedTrack) :
             track_id(trackID),
             skipped_frames(0),
             prediction(p.coord()),

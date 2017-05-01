@@ -19,10 +19,11 @@ public:
     std::vector<ObjectState> trace; //previous states of the tracked object
     size_t track_id;
     size_t skipped_frames;
+    std::vector<size_t> relatedTracks; //tracks-predecessors of the current track
 
 
-    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<int> &RelatedTracks);
-    Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID, int RelatedTrack);
+    Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID, std::vector<size_t> &RelatedTracks);
+    Track(const ObjectState &p, track_t dt, track_t Accel_noise_mag, size_t trackID, size_t RelatedTrack);
     Track(const ObjectState& p, track_t dt, track_t Accel_noise_mag, size_t trackID);
 
 
@@ -51,7 +52,6 @@ private:
     cv::Rect lastRect; //
     MotionModel motionModel; // filter for motion model
 
-    std::vector<int> relatedTracks; //tracks-predecessors of the current track
     std::vector<size_t> possible_ids;
 };
 

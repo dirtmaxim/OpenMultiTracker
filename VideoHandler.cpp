@@ -19,7 +19,7 @@ VideoHandler::VideoHandler(char const* file_name, int argc, char *argv[]) {
     this->width = (int) videoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
     this->height = (int) videoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
     this->fps = (int) videoCapture.get(CV_CAP_PROP_FPS);
-//    this->fps = 500;
+    this->fps = 0;
     this->region = cv::imread("input/region.png", CV_8UC1);
 
 
@@ -52,7 +52,7 @@ VideoHandler::VideoHandler(char const* file_name, int argc, char *argv[]) {
     if (argc>0){
         if (argv[0] == "-write"){
             writeOutput = true;
-            writeDirectory = "/output/occlusionHandling";
+            writeDirectory = "/output/frames";
         } else{
             std::cout << "Unknown parameter name" << std::endl;
         }
@@ -63,7 +63,8 @@ void VideoHandler::handle() {
     // Set position pointer of video stream to the first frame.
     this->videoCapture.set(CV_CAP_PROP_POS_FRAMES, 0);
     //Counter of images to write
-    int written_image_counter = 0;
+    int frame_counter = 0;
+
     Tracker tracker(0.2f, 1.5f, 60.0f, 10, 50);
 
     cv::Scalar Colors[100];
@@ -72,6 +73,8 @@ void VideoHandler::handle() {
     }
 
     while (true) {
+        int written_image_counter = 0;
+
         cv::Mat img_input;
         cv::Mat original_img_input;
         cv::Mat processed_img_input;
@@ -147,11 +150,13 @@ void VideoHandler::handle() {
                 cv::rectangle(*img_output, rect, cv::Scalar(255, 0, 0), 0);
 
                 //Save detected object image to the /output dir
-//                if (writeOutput) {
-//                    cv::Mat roiImg = cv::Mat(blobs_labeled_img, rect);
+                if (false) {
+                    cv::Mat roiImg = cv::Mat(blobs_labeled_img, rect);
+                    std::string image = "output/frames/frame" + std::to_string(frame_counter) + "_img" + std::to_string(written_image_counter++) + ".png";
+                    std::cout << image << std::endl;
 //                    std::string image = "output/occlusions/img" + std::to_string(written_image_counter++) + ".png";
-//                    cv::imwrite(image, roiImg);
-//                }
+                    cv::imwrite(image, roiImg);
+                }
             }
         }
 
@@ -171,6 +176,11 @@ void VideoHandler::handle() {
 
         for (int i = 0; i < tracker.tracks.size(); i++)
         {
+            // Show the track ID
+            cv::putText(*img_output, std::to_string(tracker.tracks[i]->track_id), tracker.tracks[i]->getLastRect().tl(), cv::FONT_HERSHEY_PLAIN, 1, Colors[tracker.tracks[i]->track_id % 9]);
+            if (tracker.tracks[i]->relatedTracks.size()>0){
+                cv::putText(*img_output, std::to_string(tracker.tracks[i]->relatedTracks[0]), tracker.tracks[i]->getLastRect().br(), cv::FONT_HERSHEY_PLAIN, 1, Colors[tracker.tracks[i]->track_id % 9]);
+            }
             if (tracker.tracks[i]->trace.size() > 1)
             {
                 for (int j = 0; j < tracker.tracks[i]->trace.size() - 1; j++)
@@ -188,6 +198,7 @@ void VideoHandler::handle() {
         }
 
         cv::imshow("HockeyPlayerDetector", *img_output);
+        frame_counter++;
 
         // Video speed according to fps.
         int code = cv::waitKey(fps);
