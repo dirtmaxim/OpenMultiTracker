@@ -2,6 +2,8 @@
 
 ##### It uses computer vision methods to detect players on the hockey field.
 
+![](https://user-images.githubusercontent.com/11778655/35180583-a539e58a-fdc4-11e7-8b05-ee8e83e9274e.png)
+
 ```
 Requirements:
 - C++11 compiler;
