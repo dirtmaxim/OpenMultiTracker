@@ -2,7 +2,7 @@
 
 ##### It uses computer vision methods to detect players on the hockey field.
 
-![](https://user-images.githubusercontent.com/11778655/35180583-a539e58a-fdc4-11e7-8b05-ee8e83e9274e.png)
+![](https://user-images.githubusercontent.com/11778655/35180706-1d1c1d9c-fdc6-11e7-9b0d-3a6999b99025.png)
 
 ```
 Requirements:
